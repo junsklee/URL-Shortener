@@ -1,0 +1,17 @@
+DELIMITER //
+DROP PROCEDURE IF EXISTS addUser //
+
+CREATE PROCEDURE addUser(IN user varchar(45))
+BEGIN
+   INSERT INTO users (user) VALUES
+   (user);
+   SELECT LAST_INSERT_ID();
+
+   IF(ROW_COUNT() = 0) THEN
+      SIGNAL SQLSTATE '52711'
+      SET MESSAGE_TEXT = 'Unable to add the user.';
+   END IF;
+
+   SELECT LAST_INSERT_ID();
+END//
+DELIMITER ;

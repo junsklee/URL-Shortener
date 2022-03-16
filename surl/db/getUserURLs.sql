@@ -1,0 +1,10 @@
+DELIMITER //
+DROP PROCEDURE IF EXISTS getUserURLs //
+ 
+CREATE PROCEDURE getUserURLs(IN user VARCHAR(45))
+BEGIN
+  SELECT *
+    FROM urls
+      WHERE user_username = user;
+END //
+DELIMITER ;
