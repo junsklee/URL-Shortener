@@ -1,7 +1,7 @@
 DELIMITER //
 DROP PROCEDURE IF EXISTS deleteShortURL //
  
-CREATE PROCEDURE deleteShortURL(IN target VARCHAR(2048), user VARCHAR(45))
+CREATE PROCEDURE deleteShortURL(IN target VARCHAR(5), user VARCHAR(45))
 BEGIN
     DELETE FROM urls
       WHERE short_url = target
