@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
-from flask import Flask, jsonify, abort, request, make_response, session
+from flask import Flask, jsonify, abort, request, make_response, session, redirect
 from flask_restful import reqparse, Resource, Api
 from flask_session import Session
 import pymysql.cursors
@@ -27,9 +27,8 @@ app.config['SESSION_COOKIE_DOMAIN'] = settings.APP_HOST
 Session(app)
 
 ####################################################################################
-#
 # Error handlers
-#
+
 @app.errorhandler(400) # decorators to add to 400 response
 def not_found(error):
 	return make_response(jsonify( { "status": "Bad request" } ), 400)
@@ -42,16 +41,41 @@ def not_found(error):
 def not_found(error):
 	return make_response(jsonify( { "status": "Resource not found" } ), 404)
 
-####################################################################################
-#
-# Static Endpoints for humans
-#
+#Redirects the page to the corresponding long url
+class RedirectPage(Resource):
+	def get(self, url_id):
+		try:
+			dbConnection = pymysql.connect(
+				settings.DB_HOST,
+				settings.DB_USER,
+				settings.DB_PASSWD,
+				settings.DB_DATABASE,
+				charset='utf8mb4',
+				cursorclass= pymysql.cursors.DictCursor)
+			sql = 'getURL'
+			cursor = dbConnection.cursor()
+			sqlArgs = (url_id,)
+			cursor.callproc(sql,sqlArgs)
+			row = cursor.fetchone()
+			if row is None:
+				abort(404)
+			else:
+				short_uri = 'https://'+settings.APP_HOST+':'+str(settings.APP_PORT)
+				short_uri = short_uri + '/'+str(row['short_url'])
+				return redirect(row['long_url'], code=303)
+		except:
+			abort(404)
+		finally:
+			cursor.close()
+			dbConnection.close()
+
+api.add_resource(RedirectPage,'/<string:url_id>')
+
 class Root(Resource):
-   # get method. What might others be aptly named? (hint: post)
 	def get(self):
 		return app.send_static_file('index.html')
 
-api.add_resource(Root,'/')
+api.add_resource(Root, '/index.html')
 
 class RootGetURL(Resource):
 	# GET: Return full URL data from short URL
@@ -73,8 +97,8 @@ class RootGetURL(Resource):
 			sql = 'getURL'
 			cursor = dbConnection.cursor()
 			sqlArgs = (url_id,)
-			cursor.callproc(sql,sqlArgs) # stored procedure, no arguments
-			row = cursor.fetchone() # get the single result
+			cursor.callproc(sql,sqlArgs)
+			row = cursor.fetchone()
 			if row is None:
 				abort(404)
 			else:
@@ -87,23 +111,13 @@ class RootGetURL(Resource):
 			cursor.close()
 			dbConnection.close()
 
+api.add_resource(RootGetURL, '/api/<string:url_id>')
 
-api.add_resource(RootGetURL, '/<string:url_id>')
 
-class Developer(Resource):
-   # get method. What might others be aptly named? (hint: post)
-	def get(self):
-		return app.send_static_file('developer.html')
-	
-api.add_resource(Developer,'/dev')
 
-####################################################################################
-#
 # URL shorten routing: GET and POST, individual shorten access
-#
 class Shorten(Resource):
 	def post(self):
-        #
 		# POST: Create a shortened URL from long URL
         # Sample command line usage:
         #
@@ -114,8 +128,8 @@ class Shorten(Resource):
 			abort(403, description="Unauthorized - Not Signed In")
 
 		if not request.json or not 'longURL' in request.json:
-			abort(400) # bad request
-		# Pull the results out of the json request
+			abort(400)
+
 		longURL = request.json['longURL']
 		user = SignIn().getUsername()
 

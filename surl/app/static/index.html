@@ -1,18 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Welcome to restApp</title>
+  <title>url shortener</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 </head>
 <body>
-  <h1>This is app</h1>
-  <p>In a fully-formed application this page would be the single
-    page application (SPA) client that would contain calls to the rest
-    of the web service for its data (Think Twitter, Facebook...).
-    But since this is not a full application it just does this.
-  </p>
-  <p>If you'd like to see the developers documentation, scant as
-    it is, head on over to
-    <a href='dev'>
-    developers' page</a>.</p>
+  <div class="container">
+    <h1><span class="label label-warning">enter a url to shorten</span></h1>
+
+    <form action="/action_page.php">
+      <input type="text" id="url" name="url" value="https://www.youtube.com/watch?v=dQw4w9WgXcQ"><br>
+      <input type="submit" value="Submit">
+    </form>
+
+    <div id="url" class="jumbotron"></div>
+
+  </div>
+  <script>
+    $.getJSON('https://tinyurl.com/4x8z8fae', function(data) {
+        $("#url").html(data);
+    });
+    </script>
 </body>
 </html>
