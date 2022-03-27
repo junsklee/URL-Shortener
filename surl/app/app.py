@@ -44,6 +44,8 @@ def not_found(error):
 #Redirects the page to the corresponding long url
 class RedirectPage(Resource):
 	def get(self, url_id):
+		if not SignIn().isSignedIn():
+			abort(403, description="Not Signed In")
 		try:
 			dbConnection = pymysql.connect(
 				settings.DB_HOST,
