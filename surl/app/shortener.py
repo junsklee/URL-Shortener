@@ -77,12 +77,12 @@ class Root(Resource):
 
 api.add_resource(Root, '/index.html')
 
-class RootGetURL(Resource):
+class GetURLInfo(Resource):
 	# GET: Return full URL data from short URL
 	#
 	# Example request:
 	# curl -i -X GET -H "accept: application/json" -b cookie-jar
-	# 	-k https://cs3103.cs.unb.ca:26345/{url_id}
+	# 	-k https://cs3103.cs.unb.ca:26345/{url_id}/info
 	def get(self, url_id):
 		if not SignIn().isSignedIn():
 			abort(403, description="Not Signed In")
@@ -111,7 +111,7 @@ class RootGetURL(Resource):
 			cursor.close()
 			dbConnection.close()
 
-api.add_resource(RootGetURL, '/api/<string:url_id>')
+api.add_resource(GetURLInfo, '/<string:url_id>/info')
 
 
 
