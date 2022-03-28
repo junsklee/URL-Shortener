@@ -44,8 +44,6 @@ def not_found(error):
 #Redirects the page to the corresponding long url
 class RedirectPage(Resource):
 	def get(self, url_id):
-		if not SignIn().isSignedIn():
-			abort(403, description="Not Signed In")
 		try:
 			dbConnection = pymysql.connect(
 				settings.DB_HOST,
@@ -155,7 +153,7 @@ class Shorten(Resource):
    
 		uri = 'https://'+settings.APP_HOST+':'+str(settings.APP_PORT)
 		uri = uri + '/'+ str(row['short_url'])
-		return make_response(jsonify( { "shortURL" : uri } ), 201) # successful resource creation
+		return make_response(jsonify( { "shortURL" : uri } ), 201)
 
 
 ####################################################################################
@@ -353,7 +351,6 @@ class SignIn(Resource):
 api = Api(app)
 api.add_resource(Root, '/')
 api.add_resource(RedirectPage,'/<string:url_id>')
-api.add_resource(RootGetURL, '/api/<string:url_id>')
 api.add_resource(SignIn, '/signin')
 api.add_resource(Shorten, '/shorten')
 api.add_resource(UserList, '/user/<string:username>/urls')
