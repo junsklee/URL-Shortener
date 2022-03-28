@@ -1,29 +1,56 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>url shortener</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-</head>
-<body>
-  <div class="container">
-    <h1><span class="label label-warning">enter a url to shorten</span></h1>
-
-    <form action="/action_page.php">
-      <input type="text" id="url" name="url" value="https://www.youtube.com/watch?v=dQw4w9WgXcQ"><br>
-      <input type="submit" value="Submit">
-    </form>
-
-    <div id="url" class="jumbotron"></div>
-
+  <head>
+    <title>URL Shortener</title>
+  </head>
+  <body>
+    <div class="container-fluid" id="app">
+      <div class="jumbotron jumbotron-fluid text-center">
+        <h1>URL Shortifier<sup><small>TM</small></sup></sup></h1>
+        <p><em>It makes URL shorter using magic</em></p>
+      <div v-if="!authenticated" class="form-group text-center">
+        <input class="col-4 mx-auto form-control" type="text" name="username" v-model="input.username" placeholder="Username" />
+        <input class="col-4 mx-auto form-control" type="password" name="password" v-model="input.password" placeholder="Password" />
+        <button class="col-4 btn btn-outline-success" type="button" v-on:click="login()">Login</button>
+      </div>
+      <div v-else class="text-center">
+        <button type="button" class="btn btn-outline-danger" v-on:click="logout()">Logout</button>
+        <button type="button" class="btn btn-outline-primary" v-on:click="fetchUrls()">List URLS</button>
+      </div>
+    </div>
+    <div v-if="authenticated">
+      <div slot="body">
+        <div class="form-group">
+          <div class="input-group mb-3">
+            <input class="col-6 mx-auto" type="text" name="inUrl" v-model="input.newURL" placeholder="URL to Shorten" />
+            <div class="input-group-append col-6">
+              <button class="btn btn-outline-success" type="button" v-on:click="shortenUrl()">Submit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div v-if="urlData != null" id="urlList">
+        <ul class="list-group">
+          <div v-for="url in urlData">
+            <li class="list-group-item col-7 mx-auto">
+              <div class="d-flex w-100 justify-content-between">
+                <b>{{url.long_url}}:</b>  {{url.short_url}}
+                <div class="btn-group-xs">
+                  <button class="utilityBtn text-danger" v-on:click="deleteURL(url.url_id)">x</button>
+                </div>
+              </div>
+            </li>
+          </div>
+        </ul>
+      </div>
+    </div>
   </div>
-  <script>
-    $.getJSON('https://tinyurl.com/4x8z8fae', function(data) {
-        $("#url").html(data);
-    });
-    </script>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"/>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="/static/urlShortener.js" ></script>
+  <link rel="stylesheet" href="/static/schools.css"/>
 </body>
 </html>

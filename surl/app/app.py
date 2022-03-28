@@ -29,15 +29,15 @@ Session(app)
 ####################################################################################
 # Error handlers
 
-@app.errorhandler(400) # decorators to add to 400 response
+@app.errorhandler(400)
 def not_found(error):
 	return make_response(jsonify( { "status": "Bad request" } ), 400)
 
-@app.errorhandler(403) # decorators to add to 403 response
+@app.errorhandler(403)
 def not_found(error):
 	return make_response(jsonify( { "status": "Unauthorized - Not Signed In" } ), 403)
 
-@app.errorhandler(404) # decorators to add to 404 response
+@app.errorhandler(404)
 def not_found(error):
 	return make_response(jsonify( { "status": "Resource not found" } ), 404)
 
@@ -71,13 +71,12 @@ class RedirectPage(Resource):
 			cursor.close()
 			dbConnection.close()
 
-api.add_resource(RedirectPage,'/<string:url_id>')
 
 class Root(Resource):
 	def get(self):
 		return app.send_static_file('index.html')
 
-api.add_resource(Root, '/index.html')
+
 
 class GetURLInfo(Resource):
 	# GET: Return full URL data from short URL
@@ -113,8 +112,6 @@ class GetURLInfo(Resource):
 			cursor.close()
 			dbConnection.close()
 
-api.add_resource(GetURLInfo, '/<string:url_id>/info')
-
 
 
 # URL shorten routing: GET and POST, individual shorten access
@@ -144,37 +141,25 @@ class Shorten(Resource):
 				cursorclass= pymysql.cursors.DictCursor)
 			sql = 'addURL'
 			cursor = dbConnection.cursor()
-			sqlArgs = (longURL,user) # Must be a collection
-			cursor.callproc(sql,sqlArgs) # stored procedure, with arguments
+			sqlArgs = (longURL,user)
+			cursor.callproc(sql,sqlArgs)
 			row = cursor.fetchone()
 			if row is None:
 				abort(500)
-			dbConnection.commit() # database was modified, commit the changes
+			dbConnection.commit() 
 		except:
 			abort(500)
 		finally:
 			cursor.close()
 			dbConnection.close()
-		# Look closely, Grasshopper: we just created a new resource, so we're
-		# returning the uri to it, based on the return value from the stored procedure.
-		# Yes, now would be a good time check out the procedure.
+   
 		uri = 'https://'+settings.APP_HOST+':'+str(settings.APP_PORT)
 		uri = uri + '/'+ str(row['short_url'])
 		return make_response(jsonify( { "shortURL" : uri } ), 201) # successful resource creation
 
 
 ####################################################################################
-#
-# Identify/create endpoints and endpoint objects
-#
-api = Api(app)
-api.add_resource(Shorten, '/shorten')
-#api.add_resource(Shorten, '/shorten/<string:short_url>')
-
-####################################################################################
-#
 # User-related functions
-#
 class UserList(Resource):
 	# GET: Display User Info
 	#
@@ -213,7 +198,6 @@ class UserList(Resource):
 			cursor.close()
 			dbConnection.close()			
 
-api.add_resource(UserList, '/user/<string:username>/urls')
 
 class UserURL(Resource):
 	# GET: Display data for a specified URL owned by a specified user
@@ -282,16 +266,10 @@ class UserURL(Resource):
 			dbConnection.close()
 		return make_response(jsonify({"message": "Success: URL Resource Deleted"}), 200) # successful deletion
 
-api.add_resource(UserURL, '/user/<string:username>/urls/<string:url_id>')
+
 
 ####################################################################################
 # SIGN IN
-####################################################################################
-
-####################################################################################
-#
-# Routing: GET and POST using Flask-Session
-#
 class SignIn(Resource):
 	#
 	# Set Session and return Cookie
@@ -303,17 +281,15 @@ class SignIn(Resource):
 	def post(self):
 
 		if not request.json:
-			abort(400) # bad request
+			abort(400)
 
-		# Parse the json
 		parser = reqparse.RequestParser()
 		try:
- 			# Check for required attributes in json document, create a dictionary
 			parser.add_argument('username', type=str, required=True)
 			parser.add_argument('password', type=str, required=True)
 			request_params = parser.parse_args()
 		except:
-			abort(400) # bad request
+			abort(400)
 
 		if request_params['username'] in session:
 			response = {'message': 'Success'}
@@ -328,9 +304,8 @@ class SignIn(Resource):
 				ldapConnection.open()
 				ldapConnection.start_tls()
 				ldapConnection.bind()
-				# At this point we have sucessfully authenticated.
 				session['username'] = request_params['username']
-				response = {'message': 'Success - Signed In' }
+				response = {'message': 'Success - Signed In', "username": request_params['username']}
 				responseCode = 200
 			except LDAPException:
 				response = {'message': 'Invalid Credentials'}
@@ -372,23 +347,20 @@ class SignIn(Resource):
 
 	def getUsername(self):
 		return session['username']
-####################################################################################
-#
-# Identify/create endpoints and endpoint objects
-#
-api = Api(app)
-api.add_resource(SignIn, '/signin')
 
-#############################################################################
-# xxxxx= last 5 digits of your studentid. If xxxxx > 65535, subtract 30000
+####################################################################################
+# Identify/create endpoints and endpoint objects
+api = Api(app)
+api.add_resource(Root, '/')
+api.add_resource(RedirectPage,'/<string:url_id>')
+api.add_resource(RootGetURL, '/api/<string:url_id>')
+api.add_resource(SignIn, '/signin')
+api.add_resource(Shorten, '/shorten')
+api.add_resource(UserList, '/user/<string:username>/urls')
+api.add_resource(UserURL, '/user/<string:username>/urls/<string:url_id>')
+
 if __name__ == "__main__":
-	#
-	# You need to generate your own certificates. To do this:
-	#	1. cd to the directory of this app
-	#	2. run the makeCert.sh script and answer the questions.
-	#	   It will by default generate the files with the same names specified below.
-	#
-	context = ('cert.pem', 'key.pem') # Identify the certificates you've generated.
+	context = ('cert.pem', 'key.pem')
 	app.run(
 		host=settings.APP_HOST,
 		port=settings.APP_PORT,
