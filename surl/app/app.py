@@ -60,9 +60,15 @@ class RedirectPage(Resource):
 			if row is None:
 				abort(404)
 			else:
-				short_uri = 'https://'+settings.APP_HOST+':'+str(settings.APP_PORT)
-				short_uri = short_uri + '/'+str(row['short_url'])
-				return redirect(row['long_url'], code=303)
+				redirectURL = row['long_url']
+	
+				#Basic input validation to make sure the url is valid
+				if redirectURL[0:4] != "http" and redirectURL[0:3] == "www":
+					return redirect("https://" + redirectURL, code=303)
+				elif redirectURL[0:11] != "https//www." or redirectURL[0:10] != "http//www.":
+					return redirect("https://www." + redirectURL, code=303)
+				else:
+					return redirect(redirectURL, code=303)
 		except:
 			abort(404)
 		finally:
