@@ -24,7 +24,7 @@
           <div class="input-group mb-3">
             <input class="col-6 mx-auto" type="text" name="inUrl" v-model="input.newURL" placeholder="URL to Shorten" />
             <div class="input-group-append col-6">
-              <button class="btn btn-outline-success" type="button" v-on:click="shortenUrl()">Submit</button>
+              <button class="btn btn-outline-success" type="button" v-on:click="[shortenUrl(), fetchUrls()]">Submit</button>
             </div>
           </div>
         </div>
@@ -36,7 +36,7 @@
               <div class="d-flex w-100 justify-content-between">
                 <b>{{url.long_url}}:</b>  {{url.short_url}}
                 <div class="btn-group-xs">
-                  <button class="utilityBtn text-danger" v-on:click="deleteURL(url.url_id)">x</button>
+                  <button class="utilityBtn text-danger" v-on:click="[deleteURL(url.url_id), fetchUrls()]">x</button>
                 </div>
               </div>
             </li>

@@ -63,10 +63,8 @@ class RedirectPage(Resource):
 				redirectURL = row['long_url']
 	
 				#Basic input validation to make sure the url is valid
-				if redirectURL[0:4] != "http" and redirectURL[0:3] == "www":
+				if redirectURL[0:4] != "http":
 					return redirect("https://" + redirectURL, code=303)
-				elif redirectURL[0:11] != "https//www." or redirectURL[0:10] != "http//www.":
-					return redirect("https://www." + redirectURL, code=303)
 				else:
 					return redirect(redirectURL, code=303)
 		except:
