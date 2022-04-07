@@ -33,9 +33,11 @@
         <ul class="list-group">
           <div v-for="url in urlData">
             <li class="list-group-item col-7 mx-auto">
-              <div class="d-flex w-100 justify-content-between">
-                <b>{{url.long_url}}:</b>  {{url.short_url}}
+              <div class="d-flex w-100 justify-content-between flex-wrap">
+                <div class="item-big-width"><b>{{url.long_url}}:</b></div>
+                <div class="item-big-width">{{url.short_url}}</div>
                 <div class="btn-group-xs">
+                  <button class="utilityBtn text-success" v-on:click="redirectURL(url.url_id)">></button>
                   <button class="utilityBtn text-danger" v-on:click="[deleteURL(url.url_id), fetchUrls()]">x</button>
                 </div>
               </div>
@@ -51,6 +53,6 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="/static/urlShortener.js" ></script>
-  <link rel="stylesheet" href="/static/schools.css"/>
+  <link rel="stylesheet" href="/static/shortener.css"/>
 </body>
 </html>

@@ -355,6 +355,7 @@ class SignIn(Resource):
 api = Api(app)
 api.add_resource(Root, '/')
 api.add_resource(RedirectPage,'/<string:url_id>')
+api.add_resource(GetURLInfo,'/<string:url_id>/info')
 api.add_resource(SignIn, '/signin')
 api.add_resource(Shorten, '/shorten')
 api.add_resource(UserList, '/user/<string:username>/urls')

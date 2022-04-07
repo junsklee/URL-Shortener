@@ -6,10 +6,10 @@ var app = new Vue({
   el: "#app",
 
   data: {
-    serviceURL: "https://cs3103.cs.unb.ca:35695",
+    serviceURL: "https://cs3103.cs.unb.ca:26345",
     authenticated: false,
     urlData: null,
-    loggedIn: null,
+    userName: null,
     editModal: false,
     input: {
       username: "",
@@ -35,7 +35,7 @@ var app = new Vue({
             console.log(response.data);
             if (response.data.message == "Success - Signed In") {
               this.authenticated = true;
-              this.loggedIn = response.data.username;
+              this.userName = response.data.username;
             }
         })
         .catch(e => {
@@ -63,7 +63,7 @@ var app = new Vue({
 
     fetchUrls() {
       axios
-      .get(this.serviceURL+"/user/"+this.loggedIn+"/urls")
+      .get(this.serviceURL+"/user/"+this.userName+"/urls")
       .then(response => {
           this.urlData = response.data;
       })
@@ -73,17 +73,40 @@ var app = new Vue({
       });
     },
 
-    deleteURL(url_id) {
-      console.debug(this.serviceURL+"/user/"+this.loggedIn+"/urls/"+url_id);
+
+    redirectURL(url_id) {
       axios
-      .delete(this.serviceURL+"/user/"+this.loggedIn+"/urls/"+url_id)
+      .get(this.serviceURL+"/"+url_id+"/info")
+      .then(response => {
+        console.log(response.data);
+        this.selectedUrl.shortUrl = response.data.short_url;
+        this.selectedUrl.longUrl = response.data.long_url;
+
+        console.log(this.selectedUrl.shortUrl);
+        window.open(
+          this.selectedUrl.shortUrl,
+          '_blank'
+        );
+      })
+      .catch(e => {
+        alert("Unable to redirect to the url");
+        console.log(e);
+      });
+    },
+
+
+    deleteURL(url_id) {
+      console.debug(this.serviceURL+"/user/"+this.userName+"/urls/"+url_id);
+      axios
+      .delete(this.serviceURL+"/user/"+this.userName+"/urls/"+url_id)
       .then(response => {
       })
       .catch(e => {
         alert("Unable to delete the url data");
         console.log(e);
       });
-    },
+    },    
+
 
     shortenUrl() {
       axios
@@ -95,6 +118,7 @@ var app = new Vue({
             console.log(e);
       });
     },
+
 
     showModal() {
       this.editModal = true;
