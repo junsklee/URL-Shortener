@@ -34,7 +34,7 @@
           <div v-for="url in urlData">
             <li class="list-group-item col-7 mx-auto">
               <div class="d-flex w-100 justify-content-between flex-wrap">
-                <div class="item-big-width"><b>{{url.long_url}}:</b></div>
+                <div class="item-big-width"><b>{{url.long_url}}</b></div>
                 <div class="item-big-width">{{url.short_url}}</div>
                 <div class="btn-group-xs">
                   <button class="utilityBtn text-success" v-on:click="redirectURL(url.url_id)">></button>
