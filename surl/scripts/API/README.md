@@ -2,8 +2,9 @@ URL Shortener Scripts
 
 Instructions:
 
-1. run ./signinClient.sh and enter your FCS LDAP credentials to sign in.
-2. run any script below: ./<script_name.sh>
+1. run surl/app/app.py  
+2. run ./signinClient.sh and enter your FCS LDAP credentials to sign in.
+3. run any script below: ./<script_name.sh>
 
 Script Files:
 
